@@ -1,0 +1,8 @@
+# Directories
+.vs/
+Debug/
+HZL-OpenGL/Debug/
+
+
+# Files
+HZL-OpenGL/HZL-OpenGL.vcxproj.user
