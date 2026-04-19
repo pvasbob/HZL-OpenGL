@@ -7,6 +7,31 @@
 #include <string>
 #include <sstream>
 
+#define ASSERT(x) if (!(x))	__debugbreak();
+#define GLCall(x) GLClearError();\
+	x;\
+	ASSERT(GLLogCall(#x, __FILE__, __LINE__))
+
+static void GLClearError()
+{
+	//while (glGetError() != GL_NO_ERROR);
+	while (glGetError()) 
+	{
+		std::cout << "Clear Errors" << std::endl;
+	};
+}
+
+static bool GLLogCall(const char* function, const char* file, int line)
+{
+	while(GLenum error = glGetError())
+	{
+		std::cout << "[OpenGL Error] (" << error << ")" << function << 
+			" " << file << line <<  std::endl;
+		return false;
+	}
+	return true;
+}
+
 struct ShaderProgramSource
 {
 	std::string VertexSource;
@@ -152,10 +177,10 @@ int main(void)
 	//glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	ShaderProgramSource source = ParseShader("res/shaders/Basic.shader");
-	std::cout << "VERTEX" << std::endl;
-	std::cout << source.VertexSource << std::endl;
-	std::cout << "FRAGMENT" << std::endl;
-	std::cout << source.VertexSource << std::endl;
+	//std::cout << "VERTEX" << std::endl;
+	//std::cout << source.VertexSource << std::endl;
+	//std::cout << "FRAGMENT" << std::endl;
+	//std::cout << source.VertexSource << std::endl;
 
 	
 	unsigned int shader = CreateShader(source.VertexSource, source.FragmentSource);
@@ -168,9 +193,12 @@ int main(void)
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		//glDrawArrays(GL_TRIANGLES, 0, 6);
-		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+		//	
+		//GLClearError();
+		GLCall(glDrawElements(GL_TRIANGLES, 6, GL_INT, nullptr));
 		//glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
-		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (void*)(3*sizeof(unsigned int)));
+		//glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (void*)(3*sizeof(unsigned int)));
+		//ASSERT(GLLogCall());
 
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
