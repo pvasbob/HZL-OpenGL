@@ -161,12 +161,17 @@ int main(void)
 		2, 3, 0
 	};
 
+	unsigned int vao;
+	GLCall(glGenVertexArrays(1, &vao));
+	GLCall(glBindVertexArray(vao));
+
 	unsigned int buffer;	// has to be unsigned
 	glGenBuffers(1, &buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
 	glBufferData(GL_ARRAY_BUFFER, 4 * 2 * sizeof(float), positions, GL_STATIC_DRAW);
 	
 	glEnableVertexAttribArray(0);
+	// glVertexAttribPointer is not a general-purpose function. It is hard-wired to look only at the GL_ARRAY_BUFFER slot.
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 2, 0);
 
 
@@ -174,7 +179,8 @@ int main(void)
 	glGenBuffers(1, &ibo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
-	
+
+
 
 	//glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -188,10 +194,19 @@ int main(void)
 	unsigned int shader = CreateShader(source.VertexSource, source.FragmentSource);
 	glUseProgram(shader);
 
+
+
 	int location = glGetUniformLocation(shader, "u_Color");	// can execute as long as shaders are compiled and linked to compiler.
 	ASSERT(location != -1);
 	GLCall(glUniform4f(location, 0.8f, 0.3f, 0.8f, 1.0f));	// does not take shaderID as argument.  
 															// context bound, not object-bound.
+
+	// done with setup, unbind everything. 
+	GLCall(glBindVertexArray(0));
+	GLCall(glUseProgram(0));
+	GLCall(glBindBuffer(GL_ARRAY_BUFFER, 0));
+	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
+	
 
 	float r = 0.0f;
 	float increment = 0.01f;
@@ -202,9 +217,12 @@ int main(void)
 		glClear(GL_COLOR_BUFFER_BIT);
 
 
+		GLCall(glUseProgram(shader));
 
 		GLCall(glUniform4f(location, r, 0.3f, 0.8f, 1.0f));	// does not take shaderID as argument.  
 
+		GLCall(glBindVertexArray(vao));
+		//GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo));
 		//glDrawArrays(GL_TRIANGLES, 0, 6);
 		//	
 		//GLClearError();
