@@ -10,6 +10,7 @@
 #include "Renderer.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
+#include "VertexArray.h"
 
 
 struct ShaderProgramSource
@@ -144,14 +145,14 @@ int main(void)
 		};
 
 		unsigned int vao;
-		GLCall(glGenVertexArrays(1, &vao));
-		GLCall(glBindVertexArray(vao));
 
+
+		VertexArray va;
 		VertexBuffer vb(positions, 4 * 2 * sizeof(float));
 
-		glEnableVertexAttribArray(0);
-		// glVertexAttribPointer is not a general-purpose function. It is hard-wired to look only at the GL_ARRAY_BUFFER slot.
-		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 2, 0);
+		VertexBufferLayout layout;
+		layout.Push<float>(2);
+		va.AddBuffer(vb, layout);
 
 
 		IndexBuffer ib(indices, 6);
@@ -196,7 +197,7 @@ int main(void)
 
 			GLCall(glUniform4f(location, r, 0.3f, 0.8f, 1.0f));	// does not take shaderID as argument.  
 
-			GLCall(glBindVertexArray(vao));
+			va.Bind();
 			ib.Bind();
 			//GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo));
 			//glDrawArrays(GL_TRIANGLES, 0, 6);
