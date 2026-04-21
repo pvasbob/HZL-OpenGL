@@ -17,9 +17,11 @@ VertexArray::~VertexArray()
 
 void VertexArray::AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& layout)
 {
+	// bind the va
 	Bind();
+	// bind the vb so tht all the work recoreded by the binded va is done on this vb.
 	vb.Bind();
-	const auto& elements = layout.GetElements();
+	const std::vector<VertexBufferLayoutElement>& elements = layout.GetElements();
 	unsigned int offset = 0;
 	for (unsigned int i = 0; i < elements.size(); i++)
 	{
@@ -27,7 +29,7 @@ void VertexArray::AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& la
 		GLCall(glEnableVertexAttribArray(i));
 		// glVertexAttribPointer is not a general-purpose function. It is hard-wired to look only at the GL_ARRAY_BUFFER slot.
 		GLCall(glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.GetStride(), (const void*)offset));
-		offset += element.count * VertexBufferElement::GetSizeOfType(element.type);
+		offset += element.count * VertexBufferLayoutElement::GetSizeOfType(element.type);
 	}
 
 }
