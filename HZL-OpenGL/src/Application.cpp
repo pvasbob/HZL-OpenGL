@@ -9,6 +9,7 @@
 
 #include "Renderer.h"
 #include "VertexBuffer.h"
+#include "VertexBufferLayout.h"
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "Shader.h"
@@ -54,7 +55,7 @@ int main(void)
 			2, 3, 0
 		};
 
-		unsigned int vao;
+		//unsigned int vao;
 
 
 		VertexArray va;
@@ -82,31 +83,21 @@ int main(void)
 		vb.unBind();
 		ib.unBind();
 
+		Renderer renderer;
+
 
 		float r = 0.0f;
 		float increment = 0.01f;
 		/* Loop until the user closes the window */
 		while (!glfwWindowShouldClose(window))
 		{
-			/* Render here */
-			glClear(GL_COLOR_BUFFER_BIT);
-
+			renderer.Clear();
 
 			GLCall(shader.Bind());
 
 			GLCall(shader.SetUniform4f("u_Color", r, 0.3f, 0.8f, 1.0f));	// does not take shaderID as argument.  
 
-			va.Bind();
-			ib.Bind();
-			//GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo));
-			//glDrawArrays(GL_TRIANGLES, 0, 6);
-			//	
-			//GLClearError();
-			GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
-			//glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
-			//glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (void*)(3*sizeof(unsigned int)));
-			//ASSERT(GLLogCall());
-
+			renderer.Draw(va, ib, shader);
 
 			if (r > 1.0f)
 				increment = -0.05f;

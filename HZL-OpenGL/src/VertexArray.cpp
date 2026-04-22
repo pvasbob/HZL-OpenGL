@@ -1,5 +1,20 @@
 #include "VertexArray.h"
 
+// include VertexbufferLayout.h because it is commented to avoid cyclical header inclusino in VertexArray.h
+#include "VertexBufferLayout.h"
+// Important note: you can not just include like below to use a certain memeber function in a class:
+// unsigned int VertexBufferLayout::GetStride() const
+// BECAUSE:
+// YU are thinking like a Linker, which is great, but the Compiler is the one who stops you first.
+// The compiler needs the full definition of the class in order to:
+// 1. verify access rights, like public, private, protected
+// 2. determine memeory layout to make sure the object is correctly used in C++ standards.
+// 3. The "This" pointer: The funciton is actually calle like GetStride(&layout). The compiler needs to full 
+//    definition of the clas in order to handle the 'this' pointer correctly.
+// 4~. For a normal(global) function, we can do exactly that. When i define a function outside a class, it is
+//    a free function( or global function) with global scope.
+
+
 #include "Renderer.h"
 
 VertexArray::VertexArray()
