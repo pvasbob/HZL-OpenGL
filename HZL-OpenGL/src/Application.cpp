@@ -27,7 +27,8 @@ int main(void)
 		return -1;
 
 	/* Create a windowed mode window and its OpenGL context */
-	window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+	//window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+	window = glfwCreateWindow(960, 540, "Hello World", NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
@@ -42,16 +43,15 @@ int main(void)
 	if (glewInit() != GLEW_OK)
 		std::cout << "Error!" << std::endl;
 
-	std::cout << glGetString(GL_VERSION) << std::endl;
-
+	std::cout << glGetString(GL_VERSION) << std::endl; 
 
 	{
 
 		float positions[] = {
-			-0.5f, -0.5f, 0.0f, 0.0f,	// 0
-			 0.5f, -0.5f, 1.0f, 0.0f,	// 1	
-			 0.5f,  0.5f, 1.0f, 1.0f,	// 2
-			-0.5f,  0.5f, 0.0f, 1.0f	// 3
+			100.0f, 100.0f, 0.0f, 0.0f,	// 0
+			200.0f, 100.0f, 1.0f, 0.0f,	// 1	
+			200.0f, 200.0f, 1.0f, 1.0f,	// 2
+			100.0f, 200.0f, 0.0f, 1.0f	// 3
 		};
 
 		unsigned int indices[] = {
@@ -75,7 +75,19 @@ int main(void)
 
 		IndexBuffer ib(indices, 6);
 
-		glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);
+		//glm::mat4 proj = glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f);
+		glm::mat4 proj = glm::perspective(glm::radians(45.0f), 960.0f / 540.0f, 0.1f, 100.0f);
+		glm::vec4 vp1(100.0f, 100.0f, 0.0f, 1.0f);
+		glm::vec4 vp2(200.0f, 100.0f, 0.0f, 1.0f);
+		glm::vec4 vp3(200.0f, 200.0f, 0.0f, 1.0f);
+		glm::vec4 vp4(100.0f, 200.0f, 0.0f, 1.0f);
+
+		// show the conversion result line by line from the vertex position to the -1.0 ~ 1.0 
+		// not gonna be red in  later.		#
+		glm::vec4 result1 = proj * vp1;
+		glm::vec4 result2 = proj * vp2;
+		glm::vec4 result3 = proj * vp3;
+		glm::vec4 result4 = proj * vp4;
 
 
 		//glBindBuffer(GL_ARRAY_BUFFER, 0);
