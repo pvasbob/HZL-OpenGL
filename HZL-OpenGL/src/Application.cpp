@@ -15,6 +15,9 @@
 #include "Shader.h"
 #include "Texture.h"
 
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+
 int main(void)
 {
 	GLFWwindow* window;
@@ -69,7 +72,10 @@ int main(void)
 		va.AddBuffer(vb, layout);
 
 
+
 		IndexBuffer ib(indices, 6);
+
+		glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);
 
 
 		//glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -80,8 +86,11 @@ int main(void)
 		shader.Bind();
 
 		shader.SetUniform4f("u_Color", 0.8f, 0.3f, 0.8f, 1.0f);
+		shader.SetUniformMat4f("u_MVP", proj);
+
 
 		Texture texture("res/textures/ChernoLogo.png");
+		//Texture texture("res/textures/youyou.jpg");
 		texture.Bind(0);
 		// the '0' here must match the '0' right above.
 		shader.SetUniform1i("u_Texture", 0);

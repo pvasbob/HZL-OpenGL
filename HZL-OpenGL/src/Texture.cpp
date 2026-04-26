@@ -4,15 +4,20 @@
 
 
 //#define STB_IMAGE_IMPLEMENTATION
-#include "vendor/stb_image/stb_image.h"
+#include "stb_image/stb_image.h"
 
 Texture::Texture(const std::string& path)
 	:m_RendererID(0), m_FilePath(path), m_LocalBuffer(nullptr), m_Width(0), m_Height(0), m_BPP(0)
 {
 	stbi_set_flip_vertically_on_load(1);
 	m_LocalBuffer = stbi_load(path.c_str(), &m_Width, &m_Height, &m_BPP, 4);
+	ASSERT(m_LocalBuffer != nullptr);
 
 	GLCall(glGenTextures(1, &m_RendererID));
+	// by default the 0th slot is active, so no need to specify unless 
+	// you want to active another slot. Available choice 0 ~ 31
+	GLCall(glActiveTexture(GL_TEXTURE0));
+	//GLCall(glActiveTexture(0));
 	GLCall(glBindTexture(GL_TEXTURE_2D, m_RendererID));
 
 	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
