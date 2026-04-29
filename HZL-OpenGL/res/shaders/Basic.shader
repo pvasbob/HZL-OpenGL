@@ -27,6 +27,7 @@ uniform sampler2D u_Texture;
 void main()
 {
 	//color = vec4(0.2, 0.3, 0.8, 1.0);
+	// u_Texture tells which slot to sample. v_TexCoord tells on a slot, which area to sample.
 	vec4 texColor = texture(u_Texture, v_TexCoord);
 	color = texColor;
 	//color = vec4(1.0);
