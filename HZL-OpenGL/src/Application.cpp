@@ -21,6 +21,8 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw_gl3.h"
 
+#include "tests/TestClearColor.h"
+
 int main(void)
 {
 	GLFWwindow* window;
@@ -49,89 +51,9 @@ int main(void)
 	std::cout << glGetString(GL_VERSION) << std::endl; 
 
 	{
-
-		float positions[] = {
-			-50.0f, -50.0f, 0.0f, 0.0f,	// 0
-			+50.0f, -50.0f, 1.0f, 0.0f,	// 1	
-			+50.0f, +50.0f, 1.0f, 1.0f,	// 2
-			-50.0f, +50.0f, 0.0f, 1.0f	// 3
-		};
-
-
-		//float positions[] = {
-		//	 00.0f,   0.0f, 0.0f, 0.0f,	// 0
-		//	100.0f,   0.0f, 1.0f, 0.0f,	// 1	
-		//	100.0f, 100.0f, 1.0f, 1.0f,	// 2
-		//	  0.0f, 100.0f, 0.0f, 1.0f	// 3
-		//};
-
-
-
-
-		unsigned int indices[] = {
-			0, 1, 2,
-			2, 3, 0
-		};
-
-
 		GLCall(glEnable(GL_BLEND))
 		GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 	
-		VertexArray va;
-		VertexBuffer vb(positions, 4 * 4 * sizeof(float));
-
-		VertexBufferLayout layout;
-		layout.Push<float>(2);
-		layout.Push<float>(2);
-		va.AddBuffer(vb, layout);
-
-
-
-		IndexBuffer ib(indices, 6);
-
-		glm::mat4 proj = glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f);
-		// moving cameras 100 unit to the right, which is equal to moving object to left 100 units.
-		glm::mat4 view  = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
-
-		// moved into while loop
-		//glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(200, 200, 0));
-		//// the multiply order is pvm becasue of column major in opengl
-		//glm::mat4 mvp   = proj * view * model;
-
-		//position matrix in lines 
-		//glm::vec4 vp1(100.0f, 100.0f, 0.0f, 1.0f);
-		//glm::vec4 vp2(200.0f, 100.0f, 0.0f, 1.0f);
-		//glm::vec4 vp3(200.0f, 200.0f, 0.0f, 1.0f);
-		//glm::vec4 vp4(100.0f, 200.0f, 0.0f, 1.0f);
-
-		// show the conversion result line by line from the vertex position to the -1.0 ~ 1.0 
-		// not gonna be red in  later.		#
-		//glm::vec4 result1 = proj * vp1;
-		//glm::vec4 result2 = proj * vp2;
-		//glm::vec4 result3 = proj * vp3;
-		//glm::vec4 result4 = proj * vp4;
-
-
-		//glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-		
-
-		Shader shader("res/shaders/Basic.shader");
-		shader.Bind();
-
-		shader.SetUniform4f("u_Color", 0.8f, 0.3f, 0.8f, 1.0f);
-
-		Texture texture("res/textures/ChernoLogo.png");
-		//Texture texture("res/textures/youyou.jpg");
-		texture.Bind(0);
-		// the '0' here must match the '0' right above.
-		shader.SetUniform1i("u_Texture", 0);
-
-		shader.unBind();
-		va.unBind();
-		vb.unBind();
-		ib.unBind();
-
 		Renderer renderer;
 		
 		ImGui::CreateContext();
@@ -139,56 +61,25 @@ int main(void)
 		ImGui::StyleColorsDark();
 
 
-		glm::vec3 translationA(200, 200, 0);
-		glm::vec3 translationB(400, 200, 0);
+		test::TestClearColor  test;
 
-		float r = 0.0f;
-		float increment = 0.01f;
-		/* Loop until the user closes the window */
 		while (!glfwWindowShouldClose(window))
 		{
 			renderer.Clear();
 
+			test.OnUpdate(0.0f);
+			test.OnRender();
+
 
 			ImGui_ImplGlfwGL3_NewFrame();
-
-			{
-				glm::mat4 model = glm::translate(glm::mat4(1.0f), translationA);
-				glm::mat4 mvp = proj * view * model;
-				GLCall(shader.Bind());
-				shader.SetUniformMat4f("u_MVP", mvp);
-				renderer.Draw(va, ib, shader);
-			}
-
-
-			{
-				glm::mat4 model = glm::translate(glm::mat4(1.0f), translationB);
-				glm::mat4 mvp = proj * view * model;
-				GLCall(shader.Bind());
-				shader.SetUniformMat4f("u_MVP", mvp);
-				renderer.Draw(va, ib, shader);
-			}
-
-
-			{
-				// the 0.0f ~ 960.0f to be the same as that in the proj matrix? 
-				// here &translation.x is the pointer to translation as well, which should be a pointer to translation. 
-				ImGui::SliderFloat3("Translation A", &translationA.x, 0.0f, 960.0f);            // Edit 1 float using a slider from 0.0f to 1.0f    
-				ImGui::SliderFloat3("Translation B", &translationB.x, 0.0f, 960.0f);            // Edit 1 float using a slider from 0.0f to 1.0f    
-				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-			}
-
-
-
+			test.OnImGuiRender();
+			
 
 			ImGui::Render();
 			ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
 
 
-			/* Swap front and back buffers */
 			glfwSwapBuffers(window);
-
-			/* Poll for and process events */
 			glfwPollEvents();
 		}
 
